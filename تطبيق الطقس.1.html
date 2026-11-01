@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0E1624">
+<title>الطقس</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&amp;display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0E1624;--card:#17233A;--line:#22314D;--text:#EAF0FA;--muted:#9FB0CC;--soft:#C3D0E6;--accent:#FFC247;--ok:#7EE0A8}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg)}
+body{font-family:'Tajawal',system-ui,sans-serif;color:var(--text);-webkit-tap-highlight-color:transparent}
+button{font-family:inherit;cursor:pointer}
+#app{min-height:100vh;min-height:100dvh;max-width:480px;margin:0 auto;display:flex;flex-direction:column}
+header{padding:calc(20px + env(safe-area-inset-top)) 20px 8px;display:flex;flex-direction:column;gap:14px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+h1{margin:0;font-size:28px;font-weight:800;line-height:1.2}
+.muted{color:var(--muted)}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;min-height:44px;padding:0 18px;border-radius:22px;border:1px solid #2A3A58;background:transparent;color:var(--text);font-size:15px;font-weight:700}
+.chip[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:#1A1405}
+.unit{min-width:52px;min-height:44px;border-radius:14px;border:1px solid #2A3A58;background:transparent;color:var(--text);font-size:15px;font-weight:800}
+.unit[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:#1A1405}
+.status{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.dot{width:8px;height:8px;border-radius:50%;flex:none}
+main{flex:1;padding:8px 20px 24px;display:flex;flex-direction:column;gap:16px}
+.card{background:var(--card);border-radius:24px;padding:20px}
+.hero{border-radius:28px;padding:24px;display:flex;flex-direction:column;gap:16px}
+.big{font-size:76px;font-weight:800;line-height:1;letter-spacing:-2px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.stat{background:var(--card);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:4px}
+.stat b{font-size:24px;font-weight:800}
+.small{font-size:13px}
+.list{background:var(--card);border-radius:24px;padding:8px 20px}
+.li{display:flex;align-items:center;gap:10px;min-height:58px;border-bottom:1px solid var(--line)}
+.li:last-child{border-bottom:0}
+.bar{flex:1;height:8px;background:var(--line);border-radius:4px;direction:ltr}
+.bar i{display:block;height:8px;border-radius:4px;background:var(--accent)}
+.tip{border:1px solid #2A3A58;border-radius:20px;padding:16px 20px;font-size:15px;line-height:1.6}
+nav{position:sticky;bottom:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));background:#121D31;border-top:1px solid var(--line);padding:6px 8px calc(10px + env(safe-area-inset-bottom))}
+nav button{min-height:56px;background:transparent;border:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--muted);font-size:12px;font-weight:700}
+nav button[aria-pressed=true]{color:var(--accent)}
+.btn{min-height:48px;padding:0 16px;border-radius:14px;border:0;background:var(--accent);color:#1A1405;font-size:15px;font-weight:800}
+.btn.ghost{background:transparent;border:1px solid #2A3A58;color:var(--text);font-size:14px;font-weight:700;min-height:44px}
+.flow{display:flex;align-items:center;gap:6px}
+.node{display:flex;flex-direction:column;align-items:center;gap:6px;width:64px;font-size:12px;color:var(--soft)}
+.node div{width:56px;height:56px;border-radius:18px;display:flex;align-items:center;justify-content:center;border:1px solid}
+.link{flex:1;height:3px;margin-bottom:22px;border-radius:2px;background-size:24px 3px}
+.link.live{background-image:repeating-linear-gradient(90deg,var(--ok) 0 8px,transparent 8px 16px);animation:flow 1s linear infinite}
+.link.off{background-image:repeating-linear-gradient(90deg,#5A6C8C 0 8px,transparent 8px 16px)}
+.pulse{animation:pulse 2s infinite}
+.caption{padding:12px 14px;border-radius:14px;font-size:14px;line-height:1.6;font-weight:700}
+pre{margin:0;padding:14px;background:var(--bg);border-radius:14px;overflow-x:auto;font:12px/1.6 ui-monospace,Menlo,monospace;color:#CFE0FF;direction:ltr;text-align:left}
+.skel{opacity:.55}
+@keyframes flow{to{background-position:-24px 0}}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(126,224,168,.45)}70%{box-shadow:0 0 0 14px rgba(126,224,168,0)}100%{box-shadow:0 0 0 0 rgba(126,224,168,0)}}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style>
+</head>
+<body>
+<div id="app" aria-live="polite"></div>
+
+<script>
+/* ===== الإعدادات: املأ هذين الحقلين لتفعيل المزامنة مع Supabase ===== */
+const CONFIG = {
+  SUPABASE_URL: '',       // مثال: https://xxxx.supabase.co
+  SUPABASE_ANON_KEY: ''   // مفتاح anon العام
+};
+const CACHE_TTL = 30 * 60 * 1000;
+const KEY = 'wx_app_v2';
+
+const CITIES = [
+  { id: 'jer', name: 'القدس', lat: 31.7683, lon: 35.2137 },
+  { id: 'hbr', name: 'الخليل', lat: 31.5326, lon: 35.0998 },
+  { id: 'gaza', name: 'غزة', lat: 31.5017, lon: 34.4668 },
+  { id: 'ram', name: 'رام الله', lat: 31.9038, lon: 35.2034 },
+  { id: 'nab', name: 'نابلس', lat: 32.2211, lon: 35.2544 },
+  { id: 'amm', name: 'عمّان', lat: 31.9454, lon: 35.9284 }
+];
+
+const ICONS = {
+  sun: ['M12 7.5a4.5 4.5 0 1 0 0 9a4.5 4.5 0 1 0 0-9z|#FFC247|none', 'M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8|none|#FFC247'],
+  moon: ['M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z|#DCE3FF|none'],
+  part: ['M9 5.5a3.5 3.5 0 1 0 0 7a3.5 3.5 0 1 0 0-7z|#FFC247|none', 'M9 1.5v1.2M2.8 9H1.6M4.2 4.2l.9.9M13.8 4.2l-.9.9|none|#FFC247', 'M7 20h10.5a3.5 3.5 0 0 0 .3-7 5 5 0 0 0-9.6-1A4 4 0 0 0 7 20z|#E8EEFA|none'],
+  cloud: ['M7 19h10.5a3.5 3.5 0 0 0 .3-7 5 5 0 0 0-9.6-1A4 4 0 0 0 7 19z|#E8EEFA|none'],
+  rain: ['M7 15h10.5a3.5 3.5 0 0 0 .3-7 5 5 0 0 0-9.6-1A4 4 0 0 0 7 15z|#C9D6EE|none', 'M8 18l-1 3M12 18l-1 3M16 18l-1 3|none|#5CC8FF'],
+  storm: ['M7 14h10.5a3.5 3.5 0 0 0 .3-7 5 5 0 0 0-9.6-1A4 4 0 0 0 7 14z|#AEB9D6|none', 'M12.5 14l-3 5h3l-1 4 4.5-6h-3l1.5-3z|#FFC247|none']
+};
+function icon(kind, size, sw) {
+  const layers = ICONS[kind] || ICONS.cloud;
+  const p = layers.map(l => { const a = l.split('|'); return '<path d="' + a[0] + '" fill="' + a[1] + '" stroke="' + a[2] + '" stroke-width="' + (sw || 1.6) + '" stroke-linecap="round" stroke-linejoin="round"></path>'; }).join('');
+  return '<svg viewBox="0 0 24 24" width="' + size + '" height="' + size + '" aria-hidden="true">' + p + '</svg>';
+}
+function line(d, size) {
+  return '<svg viewBox="0 0 24 24" width="' + size + '" height="' + size + '" aria-hidden="true"><path d="' + d + '" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg>';
+}
+
+function wmo(code, day) {
+  if (code === 0) return day ? { k: 'sun', t: 'صافٍ' } : { k: 'moon', t: 'صافٍ' };
+  if (code === 1) return day ? { k: 'sun', t: 'غالبًا صافٍ' } : { k: 'moon', t: 'غالبًا صافٍ' };
+  if (code === 2) return day ? { k: 'part', t: 'غائم جزئيًا' } : { k: 'cloud', t: 'غائم جزئيًا' };
+  if (code === 3) return { k: 'cloud', t: 'غائم' };
+  if (code === 45 || code === 48) return { k: 'cloud', t: 'ضباب' };
+  if (code >= 51 && code <= 57) return { k: 'rain', t: 'رذاذ' };
+  if (code >= 61 && code <= 67) return { k: 'rain', t: 'أمطار' };
+  if ((code >= 71 && code <= 77) || code === 85 || code === 86) return { k: 'cloud', t: 'ثلوج' };
+  if (code >= 80 && code <= 82) return { k: 'rain', t: 'زخات مطر' };
+  if (code >= 95) return { k: 'storm', t: 'عاصفة رعدية' };
+  return { k: 'cloud', t: 'غائم' };
+}
+
+/* ===== الحالة والتخزين ===== */
+const S = { tab: 'today', cityId: 'jer', unit: 'c', cache: {}, outbox: [], lastSync: 0, synced: 0, forceOffline: false, loading: false, error: '', stale: false, deviceId: '', storageOk: true };
+
+function load() {
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (raw) {
+      const j = JSON.parse(raw);
+      ['cityId', 'unit', 'cache', 'outbox', 'lastSync', 'synced', 'deviceId'].forEach(k => { if (j[k] !== undefined) S[k] = j[k]; });
+    }
+  } catch (e) { S.storageOk = false; }
+  if (!S.deviceId) S.deviceId = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2));
+  if (!CITIES.some(c => c.id === S.cityId)) S.cityId = 'jer';
+}
+function save() {
+  try {
+    localStorage.setItem(KEY, JSON.stringify({ cityId: S.cityId, unit: S.unit, cache: S.cache, outbox: S.outbox, lastSync: S.lastSync, synced: S.synced, deviceId: S.deviceId }));
+    S.storageOk = true;
+  } catch (e) { S.storageOk = false; }
+}
+const isOffline = () => S.forceOffline || navigator.onLine === false;
+const configured = () => !!(CONFIG.SUPABASE_URL && CONFIG.SUPABASE_ANON_KEY);
+
+/* ===== الطقس ===== */
+async function fetchCity(c) {
+  const u = 'https://api.open-meteo.com/v1/forecast?latitude=' + c.lat + '&longitude=' + c.lon +
+    '&current=temperature_2m,apparent_temperature,relative_humidity_2m,is_day,weather_code,surface_pressure,wind_speed_10m' +
+    '&hourly=temperature_2m,weather_code,visibility' +
+    '&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,sunrise,sunset,uv_index_max' +
+    '&timezone=auto&forecast_days=7&wind_speed_unit=kmh';
+  const r = await fetch(u);
+  if (!r.ok) throw new Error('weather ' + r.status);
+  const j = await r.json();
+  let aqi = null;
+  try {
+    const a = await fetch('https://air-quality-api.open-meteo.com/v1/air-quality?latitude=' + c.lat + '&longitude=' + c.lon + '&current=us_aqi');
+    if (a.ok) { const aj = await a.json(); if (aj.current && aj.current.us_aqi != null) aqi = Math.round(aj.current.us_aqi); }
+  } catch (e) {}
+  return { current: j.current, hourly: j.hourly, daily: j.daily, aqi: aqi };
+}
+
+async function ensureData(force) {
+  const id = S.cityId;
+  const c = CITIES.find(x => x.id === id);
+  const hit = S.cache[id];
+  const fresh = hit && Date.now() - hit.at < CACHE_TTL;
+  S.error = ''; S.stale = false;
+  if (fresh && !force) { render(); return; }
+  if (isOffline()) { S.stale = !!hit; if (!hit) S.error = 'لا يوجد اتصال ولا بيانات محفوظة لهذه المدينة.'; render(); return; }
+  S.loading = true; render();
+  try {
+    const payload = await fetchCity(c);
+    if (id !== S.cityId) return;
+    S.cache[id] = { at: Date.now(), payload: payload };
+    enqueue('weather_cache', { city_id: id, payload: payload, fetched_at: new Date().toISOString() });
+  } catch (e) {
+    S.stale = !!hit;
+    if (!hit) S.error = 'تعذّر جلب الطقس. تحقق من الاتصال وحاول مرة أخرى.';
+  }
+  S.loading = false; save(); render();
+}
+
+/* ===== طابور المزامنة ===== */
+function enqueue(table, row) {
+  S.outbox.push({ table: table, row: row, ts: Date.now() });
+  if (S.outbox.length > 40) S.outbox = S.outbox.slice(-40);
+  save();
+  flush();
+}
+let flushing = false;
+async function flush() {
+  if (flushing || !configured() || isOffline() || !S.outbox.length) return;
+  flushing = true;
+  try {
+    while (S.outbox.length) {
+      const op = S.outbox[0];
+      const pk = op.table === 'user_prefs' ? 'device_id' : 'city_id';
+      const table = op.table === 'user_prefs' ? 'device_prefs' : 'weather_cache';
+      const r = await fetch(CONFIG.SUPABASE_URL.replace(/\/$/, '') + '/rest/v1/' + table + '?on_conflict=' + pk, {
+        method: 'POST',
+        headers: { apikey: CONFIG.SUPABASE_ANON_KEY, Authorization: 'Bearer ' + CONFIG.SUPABASE_ANON_KEY, 'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates,return=minimal' },
+        body: JSON.stringify(op.row)
+      });
+      if (!r.ok) break;
+      S.outbox.shift(); S.synced++; S.lastSync = Date.now();
+    }
+  } catch (e) {}
+  flushing = false; save(); render();
+}
+function queuePrefs() {
+  enqueue('user_prefs', { device_id: S.deviceId, city_id: S.cityId, unit: S.unit, updated_at: new Date().toISOString() });
+}
+
+/* ===== العرض ===== */
+const hhmm = ts => { try { return new Date(ts).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }); } catch (e) { return ''; } };
+const cv = t => Math.round(S.unit === 'c' ? t : t * 9 / 5 + 32);
+
+function view(p) {
+  const cur = p.current, h = p.hourly, d = p.daily;
+  const hourKey = cur.time.slice(0, 13) + ':00';
+  let idx = h.time.findIndex(t => t >= hourKey); if (idx < 0) idx = 0;
+  const w = wmo(cur.weather_code, cur.is_day === 1);
+  const hours = [];
+  for (let i = idx; i < Math.min(idx + 12, h.time.length); i++) {
+    const hr = parseInt(h.time[i].slice(11, 13), 10);
+    const m = wmo(h.weather_code[i], hr >= 6 && hr < 18);
+    hours.push({ label: i === idx ? 'الآن' : h.time[i].slice(11, 16), t: h.temperature_2m[i], k: m.k });
+  }
+  const days = d.time.map((t, i) => ({
+    label: i === 0 ? 'اليوم' : new Date(t + 'T12:00').toLocaleDateString('ar', { weekday: 'long' }),
+    hi: d.temperature_2m_max[i], lo: d.temperature_2m_min[i], pop: d.precipitation_probability_max ? d.precipitation_probability_max[i] : 0,
+    k: wmo(d.weather_code[i], true).k
+  }));
+  const vis = h.visibility ? h.visibility[idx] : null;
+  const uv = d.uv_index_max ? d.uv_index_max[0] : null;
+  return { cur: cur, w: w, hours: hours, days: days, vis: vis, uv: uv, sunrise: d.sunrise[0].slice(11, 16), sunset: d.sunset[0].slice(11, 16), aqi: p.aqi };
+}
+
+function todayHTML(v) {
+  const c = v.cur;
+  const aqiL = v.aqi == null ? '' : v.aqi <= 50 ? 'جيدة' : v.aqi <= 100 ? 'متوسطة' : 'سيئة';
+  const uvL = v.uv == null ? '' : v.uv <= 2 ? 'منخفض' : v.uv <= 5 ? 'متوسط' : 'مرتفع';
+  const stats = [
+    ['الرطوبة', Math.round(c.relative_humidity_2m), '%', c.relative_humidity_2m > 70 ? 'مرتفعة' : 'مريحة'],
+    ['الرياح', Math.round(c.wind_speed_10m), 'كم/س', c.wind_speed_10m > 25 ? 'قوية' : c.wind_speed_10m > 12 ? 'معتدلة' : 'خفيفة'],
+    ['الأشعة فوق البنفسجية', v.uv == null ? '—' : Math.round(v.uv * 10) / 10, '', uvL],
+    ['مدى الرؤية', v.vis == null ? '—' : Math.round(v.vis / 1000), 'كم', ''],
+    ['الضغط', Math.round(c.surface_pressure), 'hPa', ''],
+    ['جودة الهواء', v.aqi == null ? '—' : v.aqi, 'AQI', aqiL]
+  ];
+  let tip = 'طقس مستقر خلال الأسبوع، لا أمطار مؤثرة متوقعة.';
+  for (let i = 0; i < v.days.length; i++) {
+    if (v.days[i].pop >= 50) { tip = i === 0 ? 'احتمال أمطار اليوم، يُفضّل حمل مظلة.' : 'أمطار متوقعة يوم ' + v.days[i].label + ' بنسبة ' + v.days[i].pop + '%.'; break; }
+  }
+  return '<section class="card hero"><div class="row"><div style="display:flex;flex-direction:column"><span class="big">' + cv(c.temperature_2m) + '°</span><span style="font-size:20px;font-weight:700;margin-top:6px">' + v.w.t + '</span></div>' + icon(v.w.k, 104, 1.4) + '</div>' +
+    '<div style="display:flex;gap:16px;flex-wrap:wrap;font-size:15px;color:var(--soft)"><span>العظمى ' + cv(v.days[0].hi) + '°</span><span>الصغرى ' + cv(v.days[0].lo) + '°</span><span>يبدو كأنها ' + cv(c.apparent_temperature) + '°</span></div></section>' +
+    '<section class="grid2">' + stats.map(s => '<div class="stat"><span class="small muted">' + s[0] + '</span><b>' + s[1] + ' <span class="small muted" style="font-weight:500">' + s[2] + '</span></b><span class="small" style="color:var(--soft)">' + s[3] + '</span></div>').join('') + '</section>' +
+    '<section class="stat" style="flex-direction:row;justify-content:space-between;align-items:center;padding:16px 20px"><div><div class="small muted">الشروق</div><div style="font-size:20px;font-weight:700">' + v.sunrise + '</div></div><div style="text-align:left"><div class="small muted">الغروب</div><div style="font-size:20px;font-weight:700">' + v.sunset + '</div></div></section>' +
+    '<section class="tip">' + tip + '</section>';
+}
+
+function hoursHTML(v) {
+  const ts = v.hours.map(x => x.t), mn = Math.min.apply(null, ts), mx = Math.max.apply(null, ts);
+  return '<section class="list">' + v.hours.map(x => {
+    const wd = mx === mn ? 60 : Math.round(30 + (x.t - mn) / (mx - mn) * 70);
+    return '<div class="li"><span style="width:52px;font-size:14px;color:var(--soft)">' + x.label + '</span>' + icon(x.k, 30) + '<div class="bar"><i style="width:' + wd + '%"></i></div><span style="width:44px;text-align:left;font-size:17px;font-weight:700">' + cv(x.t) + '°</span></div>';
+  }).join('') + '</section>';
+}
+
+function weekHTML(v) {
+  const mn = Math.min.apply(null, v.days.map(x => x.lo)), mx = Math.max.apply(null, v.days.map(x => x.hi)), sp = Math.max(1, mx - mn);
+  return '<section class="list">' + v.days.map(x => {
+    const left = Math.round((x.lo - mn) / sp * 100), wd = Math.max(10, Math.round((x.hi - x.lo) / sp * 100));
+    return '<div class="li" style="min-height:60px"><span style="width:68px;font-size:15px;font-weight:700">' + x.label + '</span>' + icon(x.k, 30) + '<span style="width:38px;font-size:13px;color:#6FD3FF;text-align:center">' + (x.pop ? x.pop + '%' : '') + '</span><span style="width:30px;text-align:left;color:var(--muted)">' + cv(x.lo) + '°</span><div class="bar"><i style="margin-left:' + left + '%;width:' + wd + '%"></i></div><span style="width:30px;text-align:left;font-weight:700">' + cv(x.hi) + '°</span></div>';
+  }).join('') + '</section>';
+}
+
+const SQL = 'create table device_prefs (\n  device_id text primary key,\n  city_id text,\n  unit text check (unit in (\'c\',\'f\')),\n  updated_at timestamptz default now()\n);\n\ncreate table weather_cache (\n  city_id text primary key,\n  payload jsonb not null,\n  fetched_at timestamptz not null default now()\n);\n\nalter table device_prefs enable row level security;\nalter table weather_cache enable row level security;\n\ncreate policy "anon insert prefs" on device_prefs\n  for insert to anon with check (true);\ncreate policy "anon update prefs" on device_prefs\n  for update to anon using (true) with check (true);\ncreate policy "anon insert cache" on weather_cache\n  for insert to anon with check (true);\ncreate policy "anon update cache" on weather_cache\n  for update to anon using (true) with check (true);\ncreate policy "anon read cache" on weather_cache\n  for select to anon using (true);';
+
+function syncHTML() {
+  const off = isOffline(), pend = S.outbox.length, cfg = configured();
+  const hit = S.cache[S.cityId];
+  const mins = hit ? Math.floor((Date.now() - hit.at) / 60000) : 0;
+  const fresh = hit && Date.now() - hit.at < CACHE_TTL;
+  const nodeS = (c, bg, x) => 'color:' + c + ';border-color:' + c + ';background:' + bg + ';' + (x || '');
+  let cap, capS;
+  if (off) { cap = pend ? pend + ' تغيير محفوظ على جهازك بأمان، وسيُرسل عند عودة الاتصال.' : 'لا يوجد اتصال. تغييراتك ستُحفظ محليًا ولن تضيع.'; capS = 'background:#3A2F14;color:#FFD27A'; }
+  else if (cfg) { cap = 'متصل: كل تغيير يُحفظ محليًا ويُرسل إلى Supabase.'; capS = 'background:#14332A;color:#8FEBB6'; }
+  else { cap = 'الكاش المحلي يعمل. أضف SUPABASE_URL و SUPABASE_ANON_KEY في أعلى الملف لتفعيل الإرسال.'; capS = 'background:#14332A;color:#8FEBB6'; }
+  const rows = [
+    ['التخزين المحلي', S.storageOk ? 'نشط' : 'غير متاح'],
+    ['الشبكة', off ? 'غير متصل' : 'متصل'],
+    ['Supabase', cfg ? 'مُعدّ' : 'غير مُعدّ'],
+    ['آخر تحديث للمدينة', hit ? hhmm(hit.at) + ' (قبل ' + mins + ' د)' : '—'],
+    ['صلاحية الكاش (30 د)', fresh ? 'صالح' : 'منتهٍ']
+  ];
+  const ob = S.outbox.slice(-5).reverse().map(o => '<div dir="ltr" style="font:12px ui-monospace,Menlo,monospace;color:var(--soft);text-align:left">' + hhmm(o.ts) + '  upsert ' + o.table + '</div>').join('');
+  return '<section class="card" style="display:flex;flex-direction:column;gap:16px"><div><div style="font-size:17px;font-weight:800">مزامنة ذكية تعمل دون إنترنت</div><div class="small muted" style="line-height:1.6;margin-top:4px">كل تغيير يُحفظ على جهازك فورًا، ثم يُرسل إلى قاعدة البيانات عندما يتوفر الاتصال.</div></div>' +
+    '<div class="flow"><div class="node"><div style="' + nodeS('#EAF0FA', '#1E2D49') + '">' + line('M8 2h8a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zM11 18h2', 26) + '</div>جهازك</div><div class="link live"></div>' +
+    '<div class="node"><div style="' + nodeS('#7EE0A8', '#17342F') + '">' + line('M4 6c0-1.7 3.6-3 8-3s8 1.3 8 3-3.6 3-8 3-8-1.3-8-3zM4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6', 26) + '</div>الكاش</div><div class="link ' + (off ? 'off' : 'live') + '"></div>' +
+    '<div class="node"><div class="' + (off ? '' : 'pulse') + '" style="' + (off ? nodeS('#7A8BA8', '#141F33') : nodeS('#7EE0A8', '#17342F')) + '">' + line('M7 19h10.5a3.5 3.5 0 0 0 .3-7 5 5 0 0 0-9.6-1A4 4 0 0 0 7 19z', 26) + '</div>Supabase</div></div>' +
+    '<div class="caption" style="' + capS + '">' + cap + '</div>' +
+    '<button class="btn" data-a="sim" aria-pressed="' + S.forceOffline + '">' + (S.forceOffline ? 'إنهاء التجربة وإرسال الطابور' : 'تجربة وضع عدم الاتصال') + '</button></section>' +
+    '<section class="grid3"><div class="stat"><span class="small muted">تمت مزامنته</span><b>' + S.synced + '</b><span class="small">تغيير</span></div><div class="stat"><span class="small muted">بانتظار الاتصال</span><b>' + pend + '</b><span class="small">محفوظ محليًا</span></div><div class="stat"><span class="small muted">آخر مزامنة</span><b>' + (S.lastSync ? hhmm(S.lastSync) : '—') + '</b><span class="small">بتوقيت جهازك</span></div></section>' +
+    '<section class="list">' + rows.map(r => '<div class="li" style="min-height:52px;justify-content:space-between"><span class="small muted" style="font-size:14px">' + r[0] + '</span><b style="font-size:15px">' + r[1] + '</b></div>').join('') + '</section>' +
+    '<div style="display:flex;flex-wrap:wrap;gap:8px"><button class="btn ghost" data-a="refresh">تحديث الطقس الآن</button><button class="btn ghost" data-a="clearOutbox">مسح الطابور</button><button class="btn ghost" data-a="clearCache">حذف الكاش</button></div>' +
+    '<section class="card" style="display:flex;flex-direction:column;gap:8px"><b style="font-size:15px">آخر العمليات المعلّقة</b>' + (ob || '<span class="small muted" style="font-size:14px">لا توجد عمليات معلّقة.</span>') + '</section>' +
+    '<section class="card" style="display:flex;flex-direction:column;gap:10px"><b style="font-size:15px">مخطط Postgres / Supabase</b><pre>' + SQL.replace(/</g, '&lt;') + '</pre></section>';
+}
+
+function render() {
+  const city = CITIES.find(c => c.id === S.cityId);
+  const hit = S.cache[S.cityId];
+  const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent');
+  let body = '';
+  if (S.tab === 'sync') body = syncHTML();
+  else if (hit) {
+    const v = view(hit.payload);
+    body = S.tab === 'today' ? todayHTML(v) : S.tab === 'hours' ? hoursHTML(v) : weekHTML(v);
+  } else if (S.error) body = '<section class="card" style="display:flex;flex-direction:column;gap:12px"><span>' + S.error + '</span><button class="btn" data-a="refresh">إعادة المحاولة</button></section>';
+  else body = '<section class="card skel">جارٍ تحميل الطقس…</section>';
+
+  const fresh = hit && Date.now() - hit.at < CACHE_TTL;
+  const dot = !S.storageOk || S.error ? '#FF8F6B' : isOffline() ? '#FFC247' : '#7EE0A8';
+  const st = S.loading ? 'جارٍ التحديث…' : (isOffline() ? 'دون اتصال' : 'متصل') + ' · ' + (hit ? (S.stale || !fresh ? 'بيانات محفوظة قديمة' : 'محدّثة ' + hhmm(hit.at)) : 'لا بيانات');
+  const date = new Date().toLocaleDateString('ar-u-nu-latn', { weekday: 'long', day: 'numeric', month: 'long' });
+  const tabs = [['today', 'اليوم', 'M3 11l9-8 9 8M5 10v10h14V10'], ['hours', 'الساعات', 'M12 7v5l3 2M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18z'], ['week', 'الأسبوع', 'M4 5h16v15H4zM4 10h16M8 3v4M16 3v4'], ['sync', 'المزامنة', 'M20 12a8 8 0 0 1-14 5.3M4 12a8 8 0 0 1 14-5.3M18 3v4h-4M6 21v-4h4']];
+
+  document.getElementById('app').innerHTML =
+    '<header><div class="row"><div><div class="small muted" style="font-size:14px">' + date + '</div><h1>' + city.name + '</h1></div>' +
+    '<div class="row" style="gap:6px" role="group" aria-label="وحدة الحرارة"><button class="unit" dir="ltr" data-a="unit:c" aria-pressed="' + (S.unit === 'c') + '">°C</button><button class="unit" dir="ltr" data-a="unit:f" aria-pressed="' + (S.unit === 'f') + '">°F</button></div></div>' +
+    '<div class="chips" role="group" aria-label="المدن">' + CITIES.map(c => '<button class="chip" data-a="city:' + c.id + '" aria-pressed="' + (c.id === S.cityId) + '">' + c.name + '</button>').join('') + '</div>' +
+    '<div class="status"><span class="dot" style="background:' + dot + '"></span><span>' + st + '</span></div></header>' +
+    '<main>' + body + '</main>' +
+    '<nav aria-label="التنقل">' + tabs.map(t => '<button data-a="tab:' + t[0] + '" aria-pressed="' + (S.tab === t[0]) + '">' + line(t[2], 24) + '<span>' + t[1] + '</span></button>').join('') + '</nav>';
+}
+
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-a]'); if (!b) return;
+  const a = b.getAttribute('data-a'), parts = a.split(':'), act = parts[0], arg = parts[1];
+  if (act === 'tab') { S.tab = arg; render(); window.scrollTo(0, 0); }
+  else if (act === 'city') { if (arg !== S.cityId) { S.cityId = arg; save(); queuePrefs(); ensureData(false); } }
+  else if (act === 'unit') { if (arg !== S.unit) { S.unit = arg; save(); queuePrefs(); render(); } }
+  else if (act === 'sim') { S.forceOffline = !S.forceOffline; render(); if (!S.forceOffline) { flush(); ensureData(false); } }
+  else if (act === 'refresh') ensureData(true);
+  else if (act === 'clearOutbox') { S.outbox = []; save(); render(); }
+  else if (act === 'clearCache') { S.cache = {}; save(); ensureData(false); }
+});
+window.addEventListener('online', () => { render(); flush(); ensureData(false); });
+window.addEventListener('offline', render);
+
+load();
+render();
+ensureData(false);
+queuePrefs();
+</script>
+</body>
+</html>
